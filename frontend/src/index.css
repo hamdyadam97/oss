@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, system-ui, sans-serif;
+  --color-primary: var(--brand-primary);
+  --color-primary-dark: color-mix(in oklab, var(--brand-primary) 75%, black);
+  --color-primary-soft: color-mix(in oklab, var(--brand-primary) 10%, white);
+  --color-secondary: var(--brand-secondary);
+  --color-secondary-soft: color-mix(in oklab, var(--brand-secondary) 15%, white);
+  /* Darker gold for small text on light backgrounds (readable contrast) */
+  --color-secondary-ink: color-mix(in oklab, var(--brand-secondary) 62%, black);
+  --color-ink: #1f2a2e;
+  --color-muted: #56656a;
+  --color-sand: #f7f5f0;
+  --color-line: #e6e2d9;
+  --radius-card: 1rem;
+  --animate-fade-up: fade-up 0.6s ease-out both;
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+:root {
+  /* Sampled from the logo; overridden at runtime by the dashboard settings */
+  --brand-primary: #081940;
+  --brand-secondary: #bb944a;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  @apply bg-white font-sans text-ink antialiased;
+  line-height: 1.75;
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand-secondary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Subtle geometric pattern inspired by Najdi motifs */
+.pattern-bg {
+  background-color: var(--color-primary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 4 44 24 24 44 4 24Z' fill='none' stroke='white' stroke-opacity='.07' stroke-width='1.5'/%3E%3Cpath d='M24 14 34 24 24 34 14 24Z' fill='white' fill-opacity='.04'/%3E%3C/svg%3E");
+}
+
+.pattern-soft {
+  background-color: var(--color-sand);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cpath d='M24 4 44 24 24 44 4 24Z' fill='none' stroke='%23081940' stroke-opacity='.05' stroke-width='1.5'/%3E%3C/svg%3E");
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  .reveal { opacity: 1; transform: none; }
+}
+
+@utility container-x {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-5 py-2.5 text-sm font-semibold transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-60;
+}
+@utility btn-primary {
+  @apply btn bg-primary text-white hover:bg-primary-dark;
+}
+@utility btn-secondary {
+  @apply btn bg-secondary text-ink hover:brightness-95;
+}
+@utility btn-outline {
+  @apply btn border border-primary text-primary hover:bg-primary-soft;
+}
+@utility btn-ghost {
+  @apply btn text-ink hover:bg-sand;
+}
+@utility btn-danger {
+  @apply btn bg-red-600 text-white hover:bg-red-700;
+}
+@utility card {
+  @apply rounded-2xl border border-line bg-white shadow-sm;
+}
+@utility input {
+  @apply block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-muted/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-ink;
+}
+@utility eyebrow {
+  @apply text-sm font-semibold tracking-wide text-secondary-ink;
+}
+@utility section {
+  @apply py-16 sm:py-20;
+}
+@utility section-title {
+  @apply text-2xl font-bold text-ink sm:text-3xl;
+}
+@utility prose-text {
+  @apply whitespace-pre-line text-base leading-8 text-ink/90;
+}

@@ -1,0 +1,27 @@
+# systemd unit for the API (installed by deploy/install.sh, which fills in __APP__).
+# Gunicorn listens on a unix socket, so it never competes for a port with other projects.
+[Unit]
+Description=PMPD-A portal API (Gunicorn)
+After=network.target postgresql.service
+
+[Service]
+User=pmpda
+# Group www-data + umask 007: Nginx can use the socket and read new public uploads, nobody else can
+Group=www-data
+UMask=0007
+WorkingDirectory=__APP__/backend
+RuntimeDirectory=pmpda
+ExecStart=__APP__/backend/.venv/bin/gunicorn config.wsgi \
+    --bind unix:/run/pmpda/gunicorn.sock \
+    --umask 007 \
+    --workers 3 \
+    --timeout 60 \
+    --access-logfile -
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=multi-user.target
