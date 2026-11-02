@@ -39,6 +39,7 @@ class SiteSettings(TimeStampedModel):
     supervisor = models.CharField("جهة الإشراف", max_length=255, blank=True)
     supervisor_en = models.CharField(max_length=255, blank=True)
     founded_year = models.PositiveIntegerField("سنة التأسيس", null=True, blank=True)
+    registered_on = models.DateField("تاريخ التسجيل", null=True, blank=True)
 
     # About
     about_short = models.TextField("نبذة مختصرة", blank=True)
@@ -53,6 +54,9 @@ class SiteSettings(TimeStampedModel):
     org_structure_image = models.ImageField(
         "الهيكل التنظيمي", upload_to=RandomFilename("about"), validators=[validate_image], blank=True
     )
+    # Intro of the "why partner with us" section on the partners page
+    partnership_intro = models.TextField("لماذا التعاون مع الجمعية؟", blank=True)
+    partnership_intro_en = models.TextField(blank=True)
 
     # Contact
     phone = models.CharField("الهاتف", max_length=30, blank=True)
@@ -185,13 +189,16 @@ class AboutItem(TimeStampedModel):
     class Kind(models.TextChoices):
         GOAL = "goal", "هدف استراتيجي"
         VALUE = "value", "قيمة"
+        DISCIPLINE = "discipline", "تخصص صحي"
+        PARTNERSHIP = "partnership", "قيمة الشراكة"
 
-    kind = models.CharField("النوع", max_length=10, choices=Kind.choices)
+    kind = models.CharField("النوع", max_length=12, choices=Kind.choices)
     title = models.CharField("العنوان", max_length=255)
     title_en = models.CharField(max_length=255, blank=True)
     description = models.TextField("الوصف", blank=True)
     description_en = models.TextField(blank=True)
     icon = models.CharField("الأيقونة", max_length=50, blank=True)
+    image = models.ImageField("الصورة", upload_to=RandomFilename("about"), validators=[validate_image], blank=True)
     order = models.PositiveIntegerField("الترتيب", default=0)
     is_published = models.BooleanField("منشور", default=True)
 
@@ -200,7 +207,7 @@ class AboutItem(TimeStampedModel):
     class Meta:
         ordering = ["kind", "order"]
         verbose_name = "هدف/قيمة"
-        verbose_name_plural = "الأهداف والقيم"
+        verbose_name_plural = "الأهداف والقيم والتخصصات"
 
     def __str__(self):
         return self.title

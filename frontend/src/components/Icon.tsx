@@ -3,7 +3,7 @@ import {
   GraduationCap, HandCoins, HandHeart, Handshake, Heart, HeartPulse, Home, Leaf, Lightbulb, MapPin, Medal,
   Package, Scale, Shield, ShieldCheck, Smile, Sparkles, Sprout, Star, Target, TreePine, Trophy, Users,
   UserRound, Utensils, Baby, Accessibility, Gift, Stethoscope, Activity, Microscope, Syringe, Pill, Hospital,
-  Ambulance, Brain, Presentation, BadgeCheck, ScrollText, School, type LucideIcon,
+  Ambulance, Brain, Presentation, BadgeCheck, ScrollText, School, ScanLine, type LucideIcon,
 } from "lucide-react";
 
 /** Curated icon set selectable from the dashboard (stored by name). */
@@ -16,6 +16,7 @@ export const ICONS: Record<string, LucideIcon> = {
   pill: Pill,
   hospital: Hospital,
   ambulance: Ambulance,
+  scan: ScanLine,
   brain: Brain,
   presentation: Presentation,
   certificate: ScrollText,

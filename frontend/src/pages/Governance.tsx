@@ -40,10 +40,11 @@ export default function Governance() {
       <section className="section">
         <div className="container-x">
           {settings?.license_number && (
-            <div className="mb-10 grid gap-4 sm:grid-cols-3">
+            <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="card p-5"><p className="text-sm text-muted">{t("licensed")}</p><p className="mt-1 text-lg font-bold">{settings.license_number}</p></div>
               {settings.supervisor && <div className="card p-5"><p className="text-sm text-muted">{t("supervisedBy")}</p><p className="mt-1 font-bold">{pick(settings, "supervisor")}</p></div>}
               {settings.founded_year && <div className="card p-5"><p className="text-sm text-muted">{t("year")}</p><p className="mt-1 text-lg font-bold">{settings.founded_year}</p></div>}
+              {settings.registered_on && <div className="card p-5"><p className="text-sm text-muted">{t("registeredOn")}</p><p className="mt-1 text-lg font-bold">{formatDate(settings.registered_on)}</p></div>}
             </div>
           )}
           <Async query={query}>

@@ -97,6 +97,8 @@ class AboutView(APIView):
             {
                 "goals": s.PublicAboutItemSerializer(items.filter(kind="goal"), many=True, context=ctx).data,
                 "values": s.PublicAboutItemSerializer(items.filter(kind="value"), many=True, context=ctx).data,
+                "disciplines": s.PublicAboutItemSerializer(items.filter(kind="discipline"), many=True, context=ctx).data,
+                "partnership": s.PublicAboutItemSerializer(items.filter(kind="partnership"), many=True, context=ctx).data,
                 "board": s.PublicBoardMemberSerializer(members.filter(kind="board"), many=True, context=ctx).data,
                 "executives": s.PublicBoardMemberSerializer(members.filter(kind="executive"), many=True, context=ctx).data,
                 "licenses": s.PublicDocumentSerializer(

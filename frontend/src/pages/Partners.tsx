@@ -4,12 +4,13 @@ import { Building2, Copy, HeartHandshake } from "lucide-react";
 import {
   ConsentField, FileField, FormError, SelectField, SubmitButton, SuccessBox, TextArea, TextField, usePublicForm,
 } from "@/components/forms";
+import { Icon } from "@/components/Icon";
 import { Seo } from "@/components/Seo";
 import { Async, Empty, PageHeader, SectionHeading } from "@/components/ui";
 import { usePublic } from "@/hooks/usePublic";
 import { useSettings } from "@/hooks/useSettings";
 import { useI18n } from "@/lib/i18n";
-import type { Paginated, Partner, ProgramSummary } from "@/lib/types";
+import type { AboutItem, Paginated, Partner, ProgramSummary } from "@/lib/types";
 import { PartnerLogos } from "./Home";
 
 const KINDS = [
@@ -67,6 +68,40 @@ function DonationBox() {
   );
 }
 
+/** "Why partner with us?" — the partnership value points from the institutional profile. */
+function WhyPartner() {
+  const { t, pick } = useI18n();
+  const { data: s } = useSettings();
+  const { data } = usePublic<{ partnership: AboutItem[] }>("/about/");
+  const points = data?.partnership ?? [];
+  if (!points.length) return null;
+  return (
+    <section className="section pattern-soft">
+      <div className="container-x">
+        <SectionHeading title={t("whyPartner")} />
+        {s?.partnership_intro && <p className="prose-text -mt-4 mb-8 max-w-3xl text-muted">{pick(s, "partnership_intro")}</p>}
+        <ol className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {points.map((p, i) => (
+            <li key={p.id} className="card flex gap-4 p-6">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+                <Icon name={p.icon} className="size-6" />
+              </span>
+              <div>
+                <p className="text-xs font-bold text-secondary-ink">{String(i + 1).padStart(2, "0")}</p>
+                <h3 className="font-bold">{pick(p, "title")}</h3>
+                {p.description && <p className="mt-1 text-sm text-muted">{pick(p, "description")}</p>}
+              </div>
+            </li>
+          ))}
+          <li className="flex items-center justify-center rounded-2xl bg-primary p-6 text-center text-lg font-bold text-white">
+            {t("partnerTogether")}
+          </li>
+        </ol>
+      </div>
+    </section>
+  );
+}
+
 export default function Partners() {
   const { t, lang, pick } = useI18n();
   const query = usePublic<Partner[]>("/partners/");
@@ -83,6 +118,7 @@ export default function Partners() {
     <>
       <Seo title={t("partners")} />
       <PageHeader title={t("partners")} crumbs={[{ label: t("partners") }]} />
+      <WhyPartner />
       <section className="section">
         <div className="container-x space-y-12">
           <Async query={query}>

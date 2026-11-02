@@ -1,4 +1,4 @@
-import { Eye, FileText, Rocket } from "lucide-react";
+import { Eye, FileText, Rocket, UserRound } from "lucide-react";
 
 import { Icon } from "@/components/Icon";
 import { Seo } from "@/components/Seo";
@@ -8,7 +8,10 @@ import { useSettings } from "@/hooks/useSettings";
 import { useI18n } from "@/lib/i18n";
 import type { AboutItem, BoardMember, DocumentItem } from "@/lib/types";
 
-type AboutData = { goals: AboutItem[]; values: AboutItem[]; board: BoardMember[]; executives: BoardMember[]; licenses: DocumentItem[] };
+type AboutData = {
+  goals: AboutItem[]; values: AboutItem[]; disciplines: AboutItem[];
+  board: BoardMember[]; executives: BoardMember[]; licenses: DocumentItem[];
+};
 
 function Members({ title, members }: { title: string; members: BoardMember[] }) {
   const { pick } = useI18n();
@@ -17,10 +20,17 @@ function Members({ title, members }: { title: string; members: BoardMember[] }) 
     <section className="section">
       <div className="container-x">
         <SectionHeading title={title} />
-        <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-5">
           {members.map((m) => (
             <li key={m.id} className="card overflow-hidden text-center">
-              <Img src={m.photo} alt={pick(m, "name")} className="aspect-square w-full" />
+              {m.photo ? (
+                <Img src={m.photo} alt={pick(m, "name")} className="aspect-square w-full" />
+              ) : (
+                // No photo yet: a compact avatar instead of an empty square
+                <span className="mx-auto mt-6 flex size-20 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden="true">
+                  <UserRound className="size-10" />
+                </span>
+              )}
               <div className="p-4">
                 <p className="font-bold">{pick(m, "name")}</p>
                 <p className="mt-1 text-sm text-secondary-ink">{pick(m, "position")}</p>
@@ -38,11 +48,14 @@ export default function About() {
   const { t, pick } = useI18n();
   const { data: settings } = useSettings();
   const about = usePublic<AboutData>("/about/");
+  const short = pick(settings, "about_short");
+  // The full text often opens with the summary: don't print the same paragraph twice on this page
+  const intro = short && !pick(settings, "about_full").startsWith(short) ? short : pick(settings, "tagline");
 
   return (
     <>
-      <Seo title={t("about")} description={pick(settings, "about_short")} />
-      <PageHeader title={t("about")} intro={pick(settings, "about_short")} crumbs={[{ label: t("about") }]} />
+      <Seo title={t("about")} description={short} />
+      <PageHeader title={t("about")} intro={intro} crumbs={[{ label: t("about") }]} />
 
       {settings?.about_full && (
         <section className="section">
@@ -103,7 +116,7 @@ export default function About() {
               <section className="section bg-sand">
                 <div className="container-x">
                   <SectionHeading title={t("values")} />
-                  <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                  <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                     {data.values.map((v) => (
                       <li key={v.id} className="card p-6 text-center">
                         <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-primary-soft text-primary">
@@ -111,6 +124,28 @@ export default function About() {
                         </span>
                         <h3 className="mt-4 font-bold">{pick(v, "title")}</h3>
                         {v.description && <p className="mt-2 text-sm text-muted">{pick(v, "description")}</p>}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </section>
+            )}
+
+            {data.disciplines.length > 0 && (
+              <section className="section">
+                <div className="container-x">
+                  <SectionHeading title={t("disciplines")} />
+                  <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                    {data.disciplines.map((d) => (
+                      <li key={d.id} className="card flex flex-col overflow-hidden border-t-4 border-t-secondary">
+                        {d.image && <Img src={d.image} alt="" className="aspect-[3/2] w-full" />}
+                        <div className="flex flex-1 flex-col gap-3 p-6">
+                          <span className={`relative flex size-12 items-center justify-center rounded-xl bg-primary text-white ${d.image ? "-mt-12 ring-4 ring-white" : ""}`}>
+                            <Icon name={d.icon} className="size-6" />
+                          </span>
+                          <h3 className="font-bold">{pick(d, "title")}</h3>
+                          {d.description && <p className="text-sm text-muted">{pick(d, "description")}</p>}
+                        </div>
                       </li>
                     ))}
                   </ul>

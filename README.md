@@ -153,7 +153,7 @@ python manage.py seed_demo --clear  # يحذف كل البيانات التجر�
 **أول مرة:**
 
 ```bash
-# انسخ المشروع إلى /srv/pmpda (git clone أو scp أو WinSCP) ثم:
+sudo git clone https://github.com/hamdyadam97/oss.git /srv/pmpda
 cd /srv/pmpda
 sudo sh deploy/install.sh pmpda.com
 sudo certbot --nginx -d pmpda.com -d www.pmpda.com
@@ -176,7 +176,7 @@ sudo -u pmpda backend/.venv/bin/python backend/manage.py seed_demo      # اخت
 
 ```bash
 cd /srv/pmpda
-git pull                      # أو انسخ الملفات الجديدة
+sudo -u pmpda git pull        # المجلد ملك المستخدم pmpda بعد التثبيت
 sudo sh deploy/update.sh      # المكتبات، والـ migrations، والملفات الثابتة، وبناء الواجهة، وإعادة التشغيل
 ```
 

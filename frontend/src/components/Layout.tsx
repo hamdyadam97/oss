@@ -317,7 +317,7 @@ function OrganizationJsonLd({ settings }: { settings: SiteSettings }) {
     email: settings.email || undefined,
     telephone: settings.phone || undefined,
     address: settings.address || undefined,
-    foundingDate: settings.founded_year ? String(settings.founded_year) : undefined,
+    foundingDate: settings.registered_on || (settings.founded_year ? String(settings.founded_year) : undefined),
     sameAs: [settings.x_url, settings.instagram_url, settings.linkedin_url, settings.youtube_url, settings.facebook_url].filter(Boolean),
   };
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;

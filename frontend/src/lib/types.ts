@@ -13,6 +13,7 @@ export interface SiteSettings {
   supervisor: string;
   supervisor_en: string;
   founded_year: number | null;
+  registered_on: string | null;
   about_short: string;
   about_short_en: string;
   about_full: string;
@@ -23,6 +24,8 @@ export interface SiteSettings {
   mission_en: string;
   about_image: string | null;
   org_structure_image: string | null;
+  partnership_intro: string;
+  partnership_intro_en: string;
   phone: string;
   whatsapp: string;
   email: string;
@@ -247,12 +250,13 @@ export interface DocumentItem {
 
 export interface AboutItem {
   id: number;
-  kind: "goal" | "value";
+  kind: "goal" | "value" | "discipline" | "partnership";
   title: string;
   title_en: string;
   description: string;
   description_en: string;
   icon: string;
+  image: string | null;
 }
 
 export interface BoardMember {

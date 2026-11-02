@@ -25,6 +25,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from apps.accounts.models import User
 from apps.cms import models as cms
+from apps.cms.official_profile import SETTINGS as OFFICIAL_SETTINGS
 from apps.engagement import models as eng
 from apps.professional import models as pro
 
@@ -263,8 +264,11 @@ class Command(BaseCommand):
             privacy_contact_email="privacy@example.org.jo",
         )
         # Never overwrite real content: only fill fields that are empty or still at their default.
+        # Fields owned by the official profile stay as it set them (left empty on purpose when unknown).
         applied = {}
         for k, v in values.items():
+            if k in OFFICIAL_SETTINGS:
+                continue
             current, default = getattr(site, k), cms.SiteSettings._meta.get_field(k).default
             if current in ("", None) or current == default:
                 setattr(site, k, v)
@@ -292,8 +296,9 @@ class Command(BaseCommand):
                           layout="brand" if i == 0 else "image",
                           image=medical_image(10 + i, 1920, 800) if i else "")
 
-        # ---- goals & values
-        for i, (t, d) in enumerate([
+        # ---- goals, values & board: only on a site without the association's own (official profile) entries
+        has_about = cms.AboutItem.objects.exists()
+        for i, (t, d) in enumerate([] if has_about else [
             ("رفع كفاءة الكوادر الصحية", "تقديم برامج تدريبية معتمدة تواكب أحدث الممارسات السريرية."),
             ("تعزيز التطوير المهني المستمر", "توفير ساعات تطوير مهني مستمر (CPD) معتمدة تدعم متطلبات تجديد الترخيص."),
             ("نشر ثقافة الجودة وسلامة المرضى", "تبنّي مبادرات توعوية وتطبيقية في المنشآت الصحية."),
@@ -301,7 +306,7 @@ class Command(BaseCommand):
             ("دعم الكوادر الوطنية الشابة", "برامج إرشاد مهني وتأهيل لحديثي التخرج."),
         ]):
             self.make(cms.AboutItem, kind="goal", title=t, description=d, order=i)
-        for i, (t, d, icon) in enumerate([
+        for i, (t, d, icon) in enumerate([] if has_about else [
             ("المهنية", "نلتزم بأعلى معايير الممارسة والأخلاقيات المهنية.", "stethoscope"),
             ("الجودة", "نسعى للتميز في كل برنامج نقدّمه.", "badge-check"),
             ("التعلم المستمر", "نؤمن بأن المعرفة الطبية رحلة لا تتوقف.", "book-open"),
@@ -320,6 +325,8 @@ class Command(BaseCommand):
             ("executive", "أ. هند الروسان", "مديرة البرامج والتدريب"),
             ("executive", "أ. ماجد النسور", "مدير الشراكات والعضويات"),
         ]
+        if cms.BoardMember.objects.exists():
+            people = []
         for i, (kind, name, pos) in enumerate(people):
             self.make(cms.BoardMember, kind=kind, name=name, position=pos, order=i, photo=avatar_image(i))
 

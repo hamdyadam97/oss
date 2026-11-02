@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 from apps.cms.models import Banner, Page, SiteSettings
+from apps.cms.official_profile import apply_profile
 
 OLD_SAUDI_OPENING = "تلتزم الجمعية بحماية البيانات الشخصية وفق نظام حماية البيانات الشخصية في المملكة العربية السعودية"
 
@@ -32,34 +33,10 @@ PRIVACY_DRAFT = """تلتزم الجمعية بحماية البيانات ال�
 (مسودة — يجب مراجعتها واعتمادها من الجمعية قبل النشر)"""
 
 
-# Official "About us" text provided by the association. Applied only to empty fields,
-# so later edits from the dashboard are never overwritten.
+# Official identity texts. Applied only to empty fields, so later edits from the dashboard are never
+# overwritten. The About text, vision, mission, objectives, values and board come from the
+# institutional profile (apps/cms/official_profile.py).
 OFFICIAL_CONTENT = {
-    "about_full": (
-        "جمعية تطوير الممارسة الطبية المهنية (Professional Medical Practice Development Association – PMPD-A) "
-        "هي جمعية خيرية غير ربحية، مرخّصة من وزارة التنمية الاجتماعية الأردنية، وتتبع في أنشطتها ومجالات عملها "
-        "الصحية لوزارة الصحة، وفقًا للتشريعات والأنظمة المعمول بها في المملكة الأردنية الهاشمية.\n\n"
-        "تُعنى الجمعية بتطوير الممارسات المهنية في القطاع الصحي، وتعزيز كفاءة الكوادر الطبية والتمريضية والمهن "
-        "الصحية المساندة، من خلال التعليم والتدريب والتطوير المهني المستمر، وتنفيذ المبادرات الصحية والمجتمعية، "
-        "وبناء الشراكات الاستراتيجية مع المؤسسات الصحية والتعليمية والتدريبية والجهات ذات العلاقة."
-    ),
-    "about_full_en": (
-        "The Professional Medical Practice Development Association (PMPD-A) is a non-profit charitable association "
-        "licensed by the Jordanian Ministry of Social Development. Its health-related activities fall under the "
-        "Ministry of Health, in accordance with the laws and regulations in force in the Hashemite Kingdom of Jordan.\n\n"
-        "The association is dedicated to developing professional practice in the health sector and strengthening the "
-        "competence of medical, nursing and allied health professionals through education, training and continuing "
-        "professional development; implementing health and community initiatives; and building strategic partnerships "
-        "with health, academic and training institutions and other relevant bodies."
-    ),
-    "about_short": (
-        "جمعية خيرية غير ربحية مرخّصة من وزارة التنمية الاجتماعية الأردنية، تُعنى بتطوير الممارسات المهنية في القطاع "
-        "الصحي وتعزيز كفاءة الكوادر الطبية والتمريضية والمهن الصحية المساندة من خلال التعليم والتدريب والتطوير المهني المستمر."
-    ),
-    "about_short_en": (
-        "A non-profit charitable association licensed by the Jordanian Ministry of Social Development, dedicated to "
-        "developing professional practice in the health sector through education, training and continuing professional development."
-    ),
     "supervisor": "وزارة التنمية الاجتماعية، وتتبع في أنشطتها الصحية لوزارة الصحة",
     "supervisor_en": "Ministry of Social Development; health activities under the Ministry of Health",
     "seo_description": (
@@ -113,6 +90,11 @@ class Command(BaseCommand):
                 if not getattr(settings, field):
                     getattr(settings, field).save("logo.webp", File(logo_file.open("rb")), save=False)
         settings.save()
+
+        changed, created = apply_profile()
+        if changed or any(created.values()):
+            added = ", ".join(f"{n} {k}" for k, n in created.items() if n)
+            self.stdout.write(f"Institutional profile applied: {len(changed)} settings fields; {added or 'no new entries'}.")
 
         # Official banners, only on a site that has none (never duplicates or overrides staff changes).
         banners_dir = Path(django_settings.BASE_DIR).parent / "branding" / "banners"
